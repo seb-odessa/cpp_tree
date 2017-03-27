@@ -46,7 +46,7 @@ namespace tree {
                         a->lhv = b->rhv;
                         b->rhv = a;
                         root = b;
-                    } else if (c) {
+                    } else {
                         std::cout<<"big_right_rotate("<<a->data<<", "<<b->data<<", "<<c->data<<")\n";
                         const size_t M = height(c->lhv);
                         const size_t N = height(c->rhv);
@@ -75,7 +75,7 @@ namespace tree {
                         a->rhv = b->lhv;
                         b->lhv = a;
                         root = b;
-                    } else if (c) {
+                    } else {
                         std::cout<<"big_left_rotate("<<a->data<<", "<<b->data<<", "<<c->data<<")\n";
                         const size_t M = height(c->lhv);
                         const size_t N = height(c->rhv);
@@ -88,12 +88,9 @@ namespace tree {
                         root = c;
                     }
                 }
-
             }            
         }
     };
-
-
 
     template<typename T, typename F>
     void visit_postfix(Node<T> *root, F fn) {
