@@ -10,27 +10,29 @@
 
 #include "tree.hpp"
 
+using namespace std;
+using namespace tree;
 
 int main() {
-    using namespace std;
-    using namespace tree;
-    auto tree = make_shared<Tree<char>>();
-    char c;
-    while (cin.get(c)) {
-        //if (::isalpha(c))
-        if (::isdigit(c))
-            tree->insert(c);
+
+    auto tree = make_shared<Tree<long>>();
+    
+    for(auto value: {6,5,3,2,1,7,8,9,0}) {
+        tree->insert(value);
     }
+
+
     chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
     {
 
-        visit_infix(tree->root, [](decltype(tree->root) node) { std::cout<<node->data; } );
-        std::cout<<"\n";
-
-        visit_postfix(tree->root, [](decltype(tree->root) root) { std::cout<<root->data; });
+        visit_prefix(tree->root, [](decltype(tree->root) node) { std::cout<<"("<<node->data<<")"; } );
         std::cout<<"\n";
 
         std::cout<<"The tree height: "<<height(tree->root)<<"\n";
+        std::cout<<"The left subtree height: "<<height(tree->root->lhv)<<"\n";
+        std::cout<<"The right subtree height: "<<height(tree->root->rhv)<<"\n";
+
+        visit_infix(tree->root, [](decltype(tree->root) node) { std::cout<<"("<<node->data<<")"; } );
     }
 
     chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();

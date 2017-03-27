@@ -23,33 +23,77 @@ namespace tree {
         }
 
         void insert(const T &value) {
+            std::cout<<"Tree insert("<<value<<")\n";
             insert(root, new Node<T>(value));
         }
 
-        void insert(Node<T>* &root, Node<T>* node) {
+        void insert(Node<T>* &root, Node<T>* node) {            
             if (!root) {
                 root = node;
             } else if (root->data > node->data) {
                 insert(root->lhv, node);
-            } else {
+                Node<T>* a = root;
+                Node<T>* b = root->lhv;
+                Node<T>* c = root->lhv ? root->lhv->rhv : 0;               
+                const size_t L = height(b->lhv);    
+                const size_t C = height(b->rhv);
+                const size_t R = height(a->rhv);
+                const size_t B = 1 + std::max(L, C);
+
+                if (2 == (B - R)) {
+                    if (C <= L) {
+                        std::cout<<"small_right_rotate("<<a->data<<", "<<b->data<<")\n";
+                        a->lhv = b->rhv;
+                        b->rhv = a;
+                        root = b;
+                    } else if (c) {
+                        std::cout<<"big_right_rotate("<<a->data<<", "<<b->data<<", "<<c->data<<")\n";
+                        const size_t M = height(c->lhv);
+                        const size_t N = height(c->rhv);
+                        const size_t C = 1 + std::max(M, N);
+
+                        a->lhv = c->rhv;
+                        b->rhv = c->lhv;
+                        c->rhv = a;
+                        c->lhv = b;
+                        root = c;
+                    }
+                }
+            } else if (root->data < node->data) {
                 insert(root->rhv, node);
-            }
+                Node<T>* a = root;
+                Node<T>* b = root->rhv;
+                Node<T>* c = root->rhv ? root->rhv->lhv : 0;               
+                const size_t L = height(a->lhv);    
+                const size_t C = height(b->lhv);
+                const size_t R = height(b->rhv);
+                const size_t B = 1 + std::max(C, R);
+
+                if (2 == (B - L)) {
+                    if (C <= R) {
+                        std::cout<<"small_left_rotate("<<a->data<<", "<<b->data<<")\n";
+                        a->rhv = b->lhv;
+                        b->lhv = a;
+                        root = b;
+                    } else if (c) {
+                        std::cout<<"big_left_rotate("<<a->data<<", "<<b->data<<", "<<c->data<<")\n";
+                        const size_t M = height(c->lhv);
+                        const size_t N = height(c->rhv);
+                        const size_t C = 1 + std::max(M, N);
+
+                        a->rhv = c->lhv;
+                        b->lhv = c->rhv;
+                        c->lhv = a;
+                        c->rhv = b;
+                        root = c;
+                    }
+                }
+
+            }            
         }
     };
 
-    template<typename T>
-    void balance(Node<T>* &root) {
-        if (root->lhv && root->lhv->rhv && root->lhv->rhv->data > root->lhv->data) {
-            Node<T>* top = root->lhv->rhv;
-            Node<T>* left = root->lhv;
-            Node<T>* right = root;
-            root = top;
-            root->lhv = left;
-            root->rhv = right;
-            left->rhv = nullptr;
-            right->lhv = nullptr;
-        }
-    }
+
 
     template<typename T, typename F>
     void visit_postfix(Node<T> *root, F fn) {
