@@ -35,27 +35,26 @@ public:
                 leafs.emplace(d, std::list<Node<T>*>());
                 leafs[d].push_back(node);
             });
+
             const size_t height = tree::height(tree->root);
-            std::cout<<std::string(std::pow(2, height),'=')<<"\n";
+            const std::string header = std::string(std::pow(2, height),'=');
+            std::cout<<header<<"\n";
             for (auto& pair: leafs) {
                 size_t level = pair.first;
                 std::list<Node<T>*> nodes = pair.second;
                 const size_t points = std::pow(2, height - level);
                 const std::string small(points, ' ');
-                const std::string big(2*points-1, ' ');
+                const std::string big(2 * points - 1, ' ');
                 bool first = true;
                 for(auto &node: nodes) {
-                    if (first) {
+                    std::cout<<(first ? small : big);
+                    if (first)
                         first = false;
-                        std::cout<<small;
-                    } else {
-                        std::cout<<big;
-                    }
                     std::cout<<node->data;
                 }
                 std::cout<<"\n";
             }
-            std::cout<<std::string(std::pow(2, height),'=')<<"\n";
+            std::cout<<header<<"\n";
         }
     }
 };
