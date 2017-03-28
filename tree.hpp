@@ -8,7 +8,8 @@ namespace tree {
         T data;
         Node<T>* lhv;
         Node<T>* rhv;
-        Node(T value): data{value}, lhv{nullptr}, rhv{nullptr} {}
+        Node<T>* parent;
+        Node(T value): data{value}, lhv{nullptr}, rhv{nullptr}, parent{nullptr} {}
     };
 
     template <typename T>
@@ -23,18 +24,22 @@ namespace tree {
         }
 
         void insert(const T &value) {
-            std::cout<<"Tree insert("<<value<<")\n";
+            //std::cout<<"Tree insert("<<value<<")\n";
             insert(root, new Node<T>(value));
         }
 
-        void insert(Node<T>* &root, Node<T>* node) {            
+        void insert(Node<T>* &root, Node<T>* node) {                        
             if (!root) {
                 root = node;
             } else if (root->data > node->data) {
+                node->parent = root;
                 insert(root->lhv, node);
                 Node<T>* a = root;
                 Node<T>* b = root->lhv;
-                Node<T>* c = root->lhv ? root->lhv->rhv : 0;               
+                Node<T>* c = b ? b->rhv : nullptr;               
+                Node<T>* m = (c && c->lhv) ? c->lhv : nullptr;
+                Node<T>* n = (c && c->rhv) ? c->rhv : nullptr;
+
                 const size_t L = height(b->lhv);    
                 const size_t C = height(b->rhv);
                 const size_t R = height(a->rhv);
@@ -42,12 +47,16 @@ namespace tree {
 
                 if (2 == (B - R)) {
                     if (C <= L) {
-                        std::cout<<"small_right_rotate("<<a->data<<", "<<b->data<<")\n";
+                        //std::cout<<"small_right_rotate("<<a->data<<", "<<b->data<<")\n";
                         a->lhv = b->rhv;
                         b->rhv = a;
+
+                        b->parent = a->parent;
+                        a->parent = b;
+                        if (c) c->parent = a;
                         root = b;
                     } else {
-                        std::cout<<"big_right_rotate("<<a->data<<", "<<b->data<<", "<<c->data<<")\n";
+                        //std::cout<<"big_right_rotate("<<a->data<<", "<<b->data<<", "<<c->data<<")\n";
                         const size_t M = height(c->lhv);
                         const size_t N = height(c->rhv);
                         const size_t C = 1 + std::max(M, N);
@@ -56,14 +65,24 @@ namespace tree {
                         b->rhv = c->lhv;
                         c->rhv = a;
                         c->lhv = b;
+
+                        c->parent = a->parent;
+                        a->parent = c;
+                        b->parent = c;
+                        if (m) m->parent = b;
+                        if (n) n->parent = a;
                         root = c;
                     }
                 }
             } else if (root->data < node->data) {
+                node->parent = root;
                 insert(root->rhv, node);
                 Node<T>* a = root;
                 Node<T>* b = root->rhv;
-                Node<T>* c = root->rhv ? root->rhv->lhv : 0;               
+                Node<T>* c = b ? b->lhv : nullptr;
+                Node<T>* m = (c && c->lhv) ? c->lhv : nullptr;
+                Node<T>* n = (c && c->rhv) ? c->rhv : nullptr;
+
                 const size_t L = height(a->lhv);    
                 const size_t C = height(b->lhv);
                 const size_t R = height(b->rhv);
@@ -71,12 +90,17 @@ namespace tree {
 
                 if (2 == (B - L)) {
                     if (C <= R) {
-                        std::cout<<"small_left_rotate("<<a->data<<", "<<b->data<<")\n";
+                        //std::cout<<"small_left_rotate("<<a->data<<", "<<b->data<<")\n";
                         a->rhv = b->lhv;
                         b->lhv = a;
+
+                        b->parent = a->parent;
+                        a->parent = b;
+                        if (c) c->parent = a;
+
                         root = b;
                     } else {
-                        std::cout<<"big_left_rotate("<<a->data<<", "<<b->data<<", "<<c->data<<")\n";
+                        //std::cout<<"big_left_rotate("<<a->data<<", "<<b->data<<", "<<c->data<<")\n";                        
                         const size_t M = height(c->lhv);
                         const size_t N = height(c->rhv);
                         const size_t C = 1 + std::max(M, N);
@@ -85,6 +109,12 @@ namespace tree {
                         b->lhv = c->rhv;
                         c->lhv = a;
                         c->rhv = b;
+
+                        c->parent = a->parent;
+                        a->parent = c;
+                        b->parent = c;
+                        if (m) m->parent = a;
+                        if (n) n->parent = b;
                         root = c;
                     }
                 }
@@ -123,6 +153,12 @@ namespace tree {
     size_t height(Node<T>* root) {
         return root ? (1 + std::max(height(root->lhv), height(root->rhv))) : 0;
     }
+
+    template<typename T>
+    size_t deep(Node<T>* node) {
+        return node ? (1 + deep(node->parent)) : 0;
+    }
+
 }
 
 
